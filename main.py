@@ -1,11 +1,8 @@
-import datetime
-
 import pydantic_argparse
 
 from amexsheets.amex_data import AmexData
 from amexsheets.arguments import Arguments
 from amexsheets.consts import PROG
-from amexsheets.custom_enums import Month
 from amexsheets.gsheets_data import GSheetsData
 from utils import read
 

@@ -57,7 +57,8 @@ class AmexData:
         df = pd.read_excel(self.archive_file, header=self.START_ROW)[self.COLUMNS]
         df['Date'] = pd.to_datetime(df['Date'], format=self.DATE_STRPTIME)
         df['Month'] = df['Date'].dt.month.apply(lambda x: Month.from_int(x))
-        # df = df[df['Month'] == month]
+        df['Description'] = df['Description'].fillna('')
+        df['Merchant'] = df['Merchant'].fillna('')
         df = df[~df['Description'].isin(self.IGNORE_VALS)]
         df['Identifier'] = df['Merchant'] + '__' + df['Description']
         df['Details'] = ''
