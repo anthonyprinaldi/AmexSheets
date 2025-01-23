@@ -82,15 +82,15 @@ class GSheetsData:
         )
     
     def _add_data_validation(self):
-        grid_range = gspread.utils.a1_range_to_grid_range(
+        sheet_id = self.sheet.id
+        data_val_rangge = gspread.utils.a1_range_to_grid_range(
             f'{self.CATEGORY_COL}{self.EXPENSE_START_ROW+2}:{self.CATEGORY_COL}{self.EXPENSE_START_ROW+1+self.df.shape[0]}',
         )
-        sheet_id = self.sheet.id
-        grid_range['sheetId'] = sheet_id
+        data_val_rangge['sheetId'] = sheet_id
         reqs = [
             {
                 'setDataValidation': {
-                    'range': grid_range,
+                    'range': data_val_rangge,
                     'rule': {
                         'strict': True,
                         'showCustomUi': True,
@@ -99,6 +99,27 @@ class GSheetsData:
                             'values': [{'userEnteredValue': f"='Expense Categories'!$A$1:$A$41"}],
                         },
                     }
+                }
+            }
+        ]
+        self.sheet.spreadsheet.batch_update({'requests': reqs})
+        number_format_range = gspread.utils.a1_range_to_grid_range(
+            f'{self.AMOUNT_COL}{self.EXPENSE_START_ROW+2}:{self.AMOUNT_COL}{self.EXPENSE_START_ROW+1+self.df.shape[0]}',
+        )
+        number_format_range['sheetId'] = sheet_id
+        reqs = [
+            {
+                'repeatCell': {
+                    'range': number_format_range,
+                    'cell': {
+                        'userEnteredFormat': {
+                            'numberFormat': {
+                                'type': 'CURRENCY',
+                                'pattern': '"$"#,##0.00',
+                            }
+                        }
+                    },
+                    'fields': 'userEnteredFormat.numberFormat'
                 }
             }
         ]

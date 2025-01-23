@@ -8,6 +8,7 @@ import pandas as pd
 
 from amexsheets.consts import SAVE_DIR
 from amexsheets.custom_enums import Month
+from amexsheets.utils import convert_amount_to_idetifier_str, convert_dollar_to_float
 
 
 class AmexData:
@@ -60,9 +61,14 @@ class AmexData:
         df['Description'] = df['Description'].fillna('')
         df['Merchant'] = df['Merchant'].fillna('')
         df = df[~df['Description'].isin(self.IGNORE_VALS)]
-        df['Identifier'] = df['Merchant'] + '__' + df['Description']
         df['Details'] = ''
         df['Category'] = ''
+        df['Amount'] = df['Amount'].apply(lambda x: str(convert_dollar_to_float(x)))
+        df['Amount'] = df['Amount'].astype(float)
+        df['Identifier'] = df['Merchant'] + \
+            '__' + df['Description'] + \
+            '__' + df['Amount'].apply(lambda x: convert_amount_to_idetifier_str(x)) + \
+            '__' + df['Date'].dt.strftime('%Y%m%d')
         return df
     
     def download_and_load(self, filter_month: Optional[Month] = None) -> pd.DataFrame:
